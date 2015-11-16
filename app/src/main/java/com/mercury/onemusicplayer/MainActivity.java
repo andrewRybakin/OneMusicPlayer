@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String LOG_TAG="MainActivity";
     public static final String COMPLETE_PLAYING = "playingComplete";
 
     private Button actionButton;

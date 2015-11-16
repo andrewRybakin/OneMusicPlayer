@@ -13,6 +13,7 @@ import java.io.FileDescriptor;
 
 public class AudioPlayerService extends Service {
 
+    public static final String LOG_TAG="AudioPlayerService";
     public static final int STATE_STANDBY=0;
     public static final int STATE_PLAYING=1;
     public static final int STATE_PAUSED=2;
@@ -28,7 +29,6 @@ public class AudioPlayerService extends Service {
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.reset();
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(MainActivity.COMPLETE_PLAYING).setType("text/*"));
                 state=STATE_STANDBY;
             }
