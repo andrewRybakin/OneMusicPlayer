@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">OneMusicPlayer</string>
+    <string name="status_standby">Standby</string>
+    <string name="status_playing">Playing</string>
+    <string name="status_paused">Paused</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_continue">Continue</string>
+</resources>
