@@ -6,4 +6,5 @@
     <string name="action_play">Play</string>
     <string name="action_pause">Pause</string>
     <string name="action_continue">Continue</string>
+    <string name="volume_label">Volume:</string>
 </resources>

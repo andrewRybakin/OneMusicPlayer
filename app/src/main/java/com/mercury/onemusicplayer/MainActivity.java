@@ -6,22 +6,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String COMPLETE_PLAYING="playingComplete";
+    public static final String COMPLETE_PLAYING = "playingComplete";
 
     private Button actionButton;
     private TextView statusLabel;
     private AudioPlayerService mService;
     private Intent serviceIntent;
+    private SeekBar seekBar;
+    private AudioManager aManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }, IntentFilter.create(COMPLETE_PLAYING, "text/*"));
 
-        ServiceConnection aPConnection=new ServiceConnection() {
+        ServiceConnection aPConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                mService=((AudioPlayerServiceBinder) service).getService();
+                mService = ((AudioPlayerServiceBinder) service).getService();
                 setStatusLabelState(mService.getState());
             }
 
@@ -46,26 +51,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        serviceIntent=new Intent(this, AudioPlayerService.class);
+        serviceIntent = new Intent(this, AudioPlayerService.class);
 
-        initUI(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mService.isStandby()||mService.isPaused())
-                    mService.startPlaying();
-                else if(mService.isPlaying())
-                    mService.pause();
-
-                setStatusLabelState(mService.getState());
-            }
-        });
+        aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        initUI();
 
         startService(serviceIntent);
         bindService(serviceIntent, aPConnection, 0);
     }
 
-    private void setStatusLabelState(int state){
-        switch(state){
+    private void setStatusLabelState(int state) {
+        switch (state) {
             case AudioPlayerService.STATE_STANDBY:
                 statusLabel.setText(R.string.status_standby);
                 actionButton.setText(R.string.action_play);
@@ -81,9 +77,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initUI(View.OnClickListener listenerForActionButton){
-        actionButton=(Button)findViewById(R.id.action_button);
-        statusLabel=(TextView)findViewById(R.id.status_label);
-        actionButton.setOnClickListener(listenerForActionButton);
+    private void initUI() {
+        actionButton = (Button) findViewById(R.id.action_button);
+        statusLabel = (TextView) findViewById(R.id.status_label);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mService.isStandby() || mService.isPaused())
+                    mService.startPlaying();
+                else if (mService.isPlaying())
+                    mService.pause();
+                setStatusLabelState(mService.getState());
+            }
+        });
+        seekBar=(SeekBar)findViewById(R.id.volume_seekbar);
+        seekBar.setMax(aManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        seekBar.setProgress(aManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if((keyCode==KeyEvent.KEYCODE_VOLUME_UP)||(keyCode==KeyEvent.KEYCODE_VOLUME_DOWN)){
+            seekBar.setProgress(aManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
