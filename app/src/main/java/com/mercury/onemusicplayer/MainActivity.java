@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent serviceIntent;
     private SeekBar seekBar;
     private AudioManager aManager;
+    private ServiceConnection aPConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, IntentFilter.create(COMPLETE_PLAYING, "text/*"));
 
-        ServiceConnection aPConnection = new ServiceConnection() {
+        aPConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mService = ((AudioPlayerServiceBinder) service).getService();
@@ -115,10 +116,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(aPConnection);
+    }
+
+    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if((keyCode==KeyEvent.KEYCODE_VOLUME_UP)||(keyCode==KeyEvent.KEYCODE_VOLUME_DOWN)){
             seekBar.setProgress(aManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyUp(keyCode, event);
     }
 }
