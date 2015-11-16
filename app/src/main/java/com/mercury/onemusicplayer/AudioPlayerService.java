@@ -8,6 +8,7 @@ import android.os.IInterface;
 import android.os.Parcel;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import java.io.FileDescriptor;
 
@@ -69,6 +70,7 @@ public class AudioPlayerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(LOG_TAG, "onBind");
         return new AudioPlayerServiceBinder(this);
     }
 }

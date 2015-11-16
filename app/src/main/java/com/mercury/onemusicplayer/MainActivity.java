@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
         aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         initUI();
 
-        startService(serviceIntent);
+        //Чтоб каждый раз при повороте не совершалась попытка запуска сервиса...
+        //Ну не нравится мне, что при повороте он пытается запустить итак запущеный сервис. Тестировал - вроде не влияет на работоспособность
+        if(savedInstanceState==null)startService(serviceIntent);
         bindService(serviceIntent, aPConnection, 0);
     }
 
