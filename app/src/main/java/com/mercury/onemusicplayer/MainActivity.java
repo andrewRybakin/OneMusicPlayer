@@ -7,10 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String LOG_TAG="MainActivity";
+    public static final String LOG_TAG = "MainActivity";
     public static final String COMPLETE_PLAYING = "playingComplete";
 
     private Button actionButton;
@@ -58,9 +58,7 @@ public class MainActivity extends AppCompatActivity {
         aManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         initUI();
 
-        //Чтоб каждый раз при повороте не совершалась попытка запуска сервиса...
-        //Ну не нравится мне, что при повороте он пытается запустить итак запущеный сервис. Тестировал - вроде не влияет на работоспособность
-        if(savedInstanceState==null)startService(serviceIntent);
+        if (savedInstanceState == null) startService(serviceIntent);
         bindService(serviceIntent, aPConnection, 0);
     }
 
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 setStatusLabelState(mService.getState());
             }
         });
-        seekBar=(SeekBar)findViewById(R.id.volume_seekbar);
+        seekBar = (SeekBar) findViewById(R.id.volume_seekbar);
         seekBar.setMax(aManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         seekBar.setProgress(aManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -105,12 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                aManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
             }
         });
     }
@@ -123,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if((keyCode==KeyEvent.KEYCODE_VOLUME_UP)||(keyCode==KeyEvent.KEYCODE_VOLUME_DOWN)){
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
             seekBar.setProgress(aManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
         return super.onKeyUp(keyCode, event);
